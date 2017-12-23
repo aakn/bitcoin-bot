@@ -9,6 +9,9 @@ scalaVersion := "2.12.3"
 
 libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
+libraryDependencies += "com.netflix.hystrix" % "hystrix-core" % "1.5.12"
+libraryDependencies += ws
+
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.bitbot.controllers._"

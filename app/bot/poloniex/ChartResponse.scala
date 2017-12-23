@@ -1,9 +1,23 @@
 package bot.poloniex
 
-import play.api.libs.json.{Json, OFormat}
+import org.joda.time.DateTime
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
-case class ChartResponse(date: String, weightedAverage: BigDecimal)
+case class ChartResponse(date: DateTime, weightedAverage: Float)
 
 object ChartResponse {
-  implicit val chartResponseJsonFormat: OFormat[ChartResponse] = Json.format[ChartResponse]
+
+  private val jodaDateReads = Reads[DateTime](js =>
+    js.validate[Long].map[DateTime](dt =>
+      new DateTime(dt * 1000)
+    )
+  )
+
+  implicit val chartResponseJsonFormat: Reads[ChartResponse] = (
+    (__ \ "date").read[DateTime](jodaDateReads) and
+      (__ \ "weightedAverage").read[Float]
+
+    ) (ChartResponse.apply _)
+
 }

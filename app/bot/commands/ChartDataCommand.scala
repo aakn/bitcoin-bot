@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import bot.poloniex.ChartResponse
 import com.netflix.hystrix.{HystrixCommand, HystrixCommandGroupKey}
-import play.Logger
+import org.joda.time.DateTime
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.duration._
@@ -16,17 +16,18 @@ class ChartDataCommand @Inject()(ws: WSClient)(implicit ec: ExecutionContext) ex
     val response: Future[WSResponse] = ws.url("https://poloniex.com/public")
       .addQueryStringParameters("command" -> "returnChartData")
       .addQueryStringParameters("currencyPair" -> "USDT_BTC")
-      .addQueryStringParameters("start" -> "1500699200")
-      .addQueryStringParameters("end" -> "1500719200")
+      .addQueryStringParameters("start" -> dateTimeToString(new DateTime().minusDays(1)))
+      .addQueryStringParameters("end" -> dateTimeToString(new DateTime().plusDays(1)))
       .addQueryStringParameters("period" -> "14400")
       .withRequestTimeout(10.seconds)
       .get()
     val future = response.map {
-      r =>
-        val json = r.json
-        Logger.info("json {}", json)
-        json.as[Seq[ChartResponse]]
+      r => r.json.as[Seq[ChartResponse]]
     }
     Await.result(future, 10.seconds)
+  }
+
+  private def dateTimeToString(dt: DateTime) = {
+    (dt.getMillis / 1000).toString
   }
 }

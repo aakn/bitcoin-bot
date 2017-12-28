@@ -4,10 +4,12 @@ import javax.inject.{Inject, Singleton}
 
 import bot.commands.ChartDataCommandBuilder
 import bot.poloniex.ChartResponse
+import lib.hystrix.Futures._
 import org.joda.time.DateTime
 import play.Logger
 
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 @Singleton
 class Trader @Inject()(command: ChartDataCommandBuilder) {
@@ -18,7 +20,8 @@ class Trader @Inject()(command: ChartDataCommandBuilder) {
     val startDate = new DateTime().minusDays(30)
     val endDate = new DateTime().plusDays(1)
 
-    val response: List[ChartResponse] = command(currencyPair, startDate, endDate, period).execute()
+    val responseFuture: Future[List[ChartResponse]] = command(currencyPair, startDate, endDate, period).future
+    val response = Await.result(responseFuture, 10.seconds)
     Logger.info("number of data points from poloniex {}", response.length.toString)
 
     val lengthOfMA = 10

@@ -13,6 +13,7 @@ libraryDependencies += "com.netflix.hystrix" % "hystrix-core" % "1.5.12"
 libraryDependencies += ws
 libraryDependencies += "com.typesafe.play" %% "play-json-joda" % "2.6.8"
 libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.8"
+libraryDependencies += "io.reactivex" %% "rxscala" % "0.26.5"
 
 
 // Adds additional packages into Twirl

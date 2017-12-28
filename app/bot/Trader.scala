@@ -3,13 +3,11 @@ package bot
 import javax.inject.{Inject, Singleton}
 
 import bot.commands.ChartDataCommandBuilder
-import bot.poloniex.ChartResponse
 import lib.hystrix.Futures._
 import org.joda.time.DateTime
 import play.Logger
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 
 @Singleton
 class Trader @Inject()(command: ChartDataCommandBuilder) {
@@ -20,26 +18,27 @@ class Trader @Inject()(command: ChartDataCommandBuilder) {
     val startDate = new DateTime().minusDays(30)
     val endDate = new DateTime().plusDays(1)
 
-    val responseFuture: Future[List[ChartResponse]] = command(currencyPair, startDate, endDate, period).future
-    val response = Await.result(responseFuture, 10.seconds)
-    Logger.info("number of data points from poloniex {}", response.length.toString)
+    command(currencyPair, startDate, endDate, period).future.map {
+      response =>
+        Logger.info("number of data points from poloniex {}", response.length.toString)
 
-    val lengthOfMA = 10
-    val prices: List[BigDecimal] = List(response.head.weightedAverage)
-    List("a", "b", "c").foldLeft(0)((l, r) => l + r.length)
-    response.tail
-      .foldLeft(false, "", prices)((prev, dataPoint) => {
-        val (prevTradePlaced, prevTypeOfTrade, prices) = prev
-        val currentMovingAverage = prices.sum / prices.size
-        val previousPrice = prices.last
-        val lastPairPrice = dataPoint.weightedAverage
-        val (tradePlaced, typeOfTrade) = trade(prevTradePlaced, prevTypeOfTrade, currentMovingAverage, previousPrice, lastPairPrice)
-        val updatedPrices = (prices :+ lastPairPrice).takeRight(lengthOfMA)
-        Logger.info("{} Period: {}s {}: {} Moving Average: {}", dataPoint.date, period, currencyPair, lastPairPrice, currentMovingAverage)
-        (tradePlaced, typeOfTrade, updatedPrices)
-      })
+        val lengthOfMA = 10
+        val prices: List[BigDecimal] = List(response.head.weightedAverage)
+        List("a", "b", "c").foldLeft(0)((l, r) => l + r.length)
+        response.tail
+          .foldLeft(false, "", prices)((prev, dataPoint) => {
+            val (prevTradePlaced, prevTypeOfTrade, prices) = prev
+            val currentMovingAverage = prices.sum / prices.size
+            val previousPrice = prices.last
+            val lastPairPrice = dataPoint.weightedAverage
+            val (tradePlaced, typeOfTrade) = trade(prevTradePlaced, prevTypeOfTrade, currentMovingAverage, previousPrice, lastPairPrice)
+            val updatedPrices = (prices :+ lastPairPrice).takeRight(lengthOfMA)
+            Logger.info("{} Period: {}s {}: {} Moving Average: {}", dataPoint.date, period, currencyPair, lastPairPrice, currentMovingAverage)
+            (tradePlaced, typeOfTrade, updatedPrices)
+          })
 
-    Logger.info("DONE")
+        Logger.info("DONE")
+    }
   }
 
   private def trade(tradePlaced: Boolean, typeOfTrade: String, currentMovingAverage: BigDecimal, previousPrice: BigDecimal, lastPairPrice: BigDecimal): (Boolean, String) = {

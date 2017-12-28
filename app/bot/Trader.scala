@@ -2,15 +2,24 @@ package bot
 
 import javax.inject.{Inject, Singleton}
 
-import bot.commands.ChartDataCommand
+import bot.commands.ChartDataCommandBuilder
 import bot.poloniex.ChartResponse
+import org.joda.time.DateTime
 import play.Logger
 
+import scala.concurrent.duration._
+
 @Singleton
-class Trader @Inject()(command: ChartDataCommand) {
+class Trader @Inject()(command: ChartDataCommandBuilder) {
   def start() = {
-    val response: List[ChartResponse] = command.execute()
-    Logger.info("response from poloniex {}", response)
+    // input parameters
+    val currencyPair = "USDT_BTC"
+    val period = 30.minutes
+    val startDate = new DateTime().minusDays(30)
+    val endDate = new DateTime().plusDays(1)
+
+    val response: List[ChartResponse] = command(currencyPair, startDate, endDate, period).execute()
+    Logger.info("number of data points from poloniex {}", response.length.toString)
 
     val lengthOfMA = 10
     val prices: List[BigDecimal] = List(response.head.weightedAverage)
@@ -23,10 +32,11 @@ class Trader @Inject()(command: ChartDataCommand) {
         val lastPairPrice = dataPoint.weightedAverage
         val (tradePlaced, typeOfTrade) = trade(prevTradePlaced, prevTypeOfTrade, currentMovingAverage, previousPrice, lastPairPrice)
         val updatedPrices = (prices :+ lastPairPrice).takeRight(lengthOfMA)
-        Logger.info("{} Period: {}s {}: {} Moving Average: {}", dataPoint.date, "14400", "USDT_BTC", lastPairPrice, currentMovingAverage)
+        Logger.info("{} Period: {}s {}: {} Moving Average: {}", dataPoint.date, period, currencyPair, lastPairPrice, currentMovingAverage)
         (tradePlaced, typeOfTrade, updatedPrices)
       })
 
+    Logger.info("DONE")
   }
 
   private def trade(tradePlaced: Boolean, typeOfTrade: String, currentMovingAverage: BigDecimal, previousPrice: BigDecimal, lastPairPrice: BigDecimal): (Boolean, String) = {

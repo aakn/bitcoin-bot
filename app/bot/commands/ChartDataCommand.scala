@@ -2,7 +2,7 @@ package bot.commands
 
 import javax.inject.Inject
 
-import bot.poloniex.ChartResponse
+import bot.poloniex.Point
 import com.google.inject.assistedinject.Assisted
 import lib.hystrix.HystrixFutureCommand
 import org.joda.time.DateTime
@@ -15,9 +15,9 @@ class ChartDataCommand @Inject()(ws: WSClient, @Assisted currencyPair: String,
                                  @Assisted("startDate") startDate: DateTime,
                                  @Assisted("endDate") endDate: DateTime,
                                  @Assisted period: FiniteDuration)
-                                (implicit ec: ExecutionContext) extends HystrixFutureCommand[List[ChartResponse]](GroupKeys.poloniex()) {
+                                (implicit ec: ExecutionContext) extends HystrixFutureCommand[List[Point]](GroupKeys.poloniex()) {
 
-  def run(): Future[List[ChartResponse]] = {
+  def run(): Future[List[Point]] = {
     ws.url("https://poloniex.com/public")
       .addQueryStringParameters("command" -> "returnChartData")
       .addQueryStringParameters("currencyPair" -> currencyPair)
@@ -29,7 +29,7 @@ class ChartDataCommand @Inject()(ws: WSClient, @Assisted currencyPair: String,
       .withRequestTimeout(10.seconds)
       .get
       .map {
-        r => r.json.as[List[ChartResponse]]
+        r => r.json.as[List[Point]]
       }
   }
 

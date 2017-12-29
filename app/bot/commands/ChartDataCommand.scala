@@ -2,7 +2,7 @@ package bot.commands
 
 import javax.inject.Inject
 
-import bot.poloniex.Candlestick
+import bot.Candlestick
 import com.google.inject.assistedinject.Assisted
 import lib.hystrix.HystrixFutureCommand
 import org.joda.time.DateTime

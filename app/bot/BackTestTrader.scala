@@ -3,7 +3,6 @@ package bot
 import javax.inject.Inject
 
 import bot.functions.Chart
-import bot.poloniex.Candlestick
 import org.joda.time.DateTime
 import play.Logger
 

@@ -2,8 +2,8 @@ package bot.functions
 
 import javax.inject.Inject
 
+import bot.Candlestick
 import bot.commands.ChartDataCommandBuilder
-import bot.poloniex.Candlestick
 import lib.hystrix.Futures._
 import org.joda.time.DateTime
 

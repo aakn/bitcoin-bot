@@ -1,4 +1,4 @@
-package bot.poloniex
+package bot
 
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax._

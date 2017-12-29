@@ -3,7 +3,7 @@ package bot
 import javax.inject.Inject
 
 import bot.functions.Chart
-import bot.poloniex.Point
+import bot.poloniex.Candlestick
 import org.joda.time.DateTime
 import play.Logger
 
@@ -22,8 +22,8 @@ class BackTestTrader @Inject()(chart: Chart)(implicit ec: ExecutionContext) {
     chart.backTest(currencyPair, startDate, endDate, period).map(iterate)
   }
 
-  private def iterate(stream: Stream[Point]) =
-    stream.foreach(Logger.info("point {}", _))
+  private def iterate(stream: Stream[Candlestick]) =
+    stream.foreach(Logger.info("candlestick {}", _))
 
 
 }

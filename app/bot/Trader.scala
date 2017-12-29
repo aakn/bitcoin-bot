@@ -7,10 +7,11 @@ import lib.hystrix.Futures._
 import org.joda.time.DateTime
 import play.Logger
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 @Singleton
-class Trader @Inject()(command: ChartDataCommandBuilder) {
+class Trader @Inject()(command: ChartDataCommandBuilder)(implicit ec: ExecutionContext) {
   def start() = {
     // input parameters
     val currencyPair = "USDT_BTC"

@@ -7,11 +7,11 @@ class IndicatorSpec extends PlaySpec {
 
   "Indicator.movingAverage" should {
     "take average of all prices" in {
-      Indicator.movingAverage(10)(buildCandleStickWithAverage(2, 3, 4, 5)) == 3.5
+      Indicator.movingAverage(10)(buildCandleStickWithAverage(2, 3, 4, 5)) mustBe 3.5
     }
 
     "take average of last 4 prices" in {
-      Indicator.movingAverage(4)(buildCandleStickWithAverage(1, 2, 3, 4, 5)) == 3.5
+      Indicator.movingAverage(4)(buildCandleStickWithAverage(1, 2, 3, 4, 5)) mustBe 3.5
     }
 
   }

@@ -32,7 +32,7 @@ object Strategy {
 
   private def closeTrades(): State[Strategy, Unit] = modify[Strategy] { s =>
     val currentPrice = s.candlesticks.last.average
-    val indicated = Indicator.movingAverage(10)(s.candlesticks)
+    val indicated = Indicator.movingAverage(6.hours)(s.candlesticks)
 
     val (toBeClosed, openTrades) =
       if (currentPrice > indicated) {
@@ -58,7 +58,7 @@ object Strategy {
 
   private def openNewTrade(): State[Strategy, Unit] = modify[Strategy] { s =>
     val currentPrice = s.candlesticks.last.average
-    val indicated = Indicator.movingAverage(10)(s.candlesticks)
+    val indicated = Indicator.movingAverage(6.hours)(s.candlesticks)
 
     val openTrades =
       if (s.openTrades.lengthCompare(s.simultaneousTrades) < 0 && currentPrice < indicated) {

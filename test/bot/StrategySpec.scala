@@ -100,6 +100,21 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
       updated.closedTrades mustBe List(Trade(Closed, 8, Some(14), 4))
     }
 
+    "handle stop losses" in {
+      val initial = Strategy.init()
+      val transitions = for {
+        _ <- Strategy.tick(candlestick(10))
+        _ <- Strategy.tick(candlestick(8))
+        _ <- Strategy.tick(candlestick(6))
+        _ <- Strategy.tick(candlestick(4))
+      } yield ()
+
+      val updated = transitions.exec(initial)
+
+      updated.openTrades mustBe List()
+      updated.closedTrades mustBe List(Trade(StopLoss, 8, Some(4), 4))
+    }
+
   }
 
   private def candlestick(avg: BigDecimal) = Candlestick(DateTime.now(), avg, 0, 0, 0, 0)

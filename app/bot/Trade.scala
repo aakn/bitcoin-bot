@@ -29,7 +29,7 @@ object Trade {
     Trade(Open, currentPrice, None, stopLoss)
 
   def tick(price: BigDecimal): State[Trade, Unit] = State.modify[Trade] { s =>
-    if (price < s.stopLoss) s.copy(exitPrice = Some(price), status = StopLoss)
+    if (price <= s.stopLoss) s.copy(exitPrice = Some(price), status = StopLoss)
     else s
   }
 

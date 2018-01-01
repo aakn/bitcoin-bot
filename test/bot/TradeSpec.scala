@@ -12,9 +12,9 @@ class TradeSpec extends PlaySpec {
 
     "tick and close to stop loss" in {
       val trade = Trade.init(10, 5)
-      val actual = Trade.tick(4.99).exec(trade)
+      val actual = Trade.tick(5).exec(trade)
 
-      actual mustBe Trade(StopLoss, 10, Some(4.99), 5)
+      actual mustBe Trade(StopLoss, 10, Some(5), 5)
     }
 
     "tick and not close if current price is greater than stop loss" in {

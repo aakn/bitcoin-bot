@@ -18,6 +18,7 @@ object Strategy {
       _ <- addCandlestick(candlestick)
       _ <- closeTrades()
       _ <- openNewTrade()
+      _ <- handleStopLosses()
     } yield ()
 
     stateTransitions.exec(s)
@@ -39,6 +40,18 @@ object Strategy {
           .partition(currentPrice > _.entryPrice)
       } else (List(), s.openTrades)
     val closedTrades = s.closedTrades ::: toBeClosed.map(Trade.close(currentPrice).exec(_))
+
+    s.copy(openTrades = openTrades, closedTrades = closedTrades)
+  }
+
+
+  private def handleStopLosses(): State[Strategy, Unit] = modify[Strategy] { s =>
+    val currentPrice = s.candlesticks.last.average
+
+    val (stopLossTrades, openTrades) = s.openTrades
+      .map(Trade.tick(currentPrice).exec)
+      .partition(_.status == StopLoss)
+    val closedTrades = s.closedTrades ::: stopLossTrades
 
     s.copy(openTrades = openTrades, closedTrades = closedTrades)
   }

@@ -14,7 +14,7 @@ class BackTestTask @Inject()(actorSystem: ActorSystem, trader: BackTestTrader)(i
   def run: Cancellable = actorSystem.scheduler.scheduleOnce(delay = 0.seconds) {
     // the block of code that will be executed
     Logger.info("Executing something...")
-    trader.start()
+    trader.run()
   }
 
 }

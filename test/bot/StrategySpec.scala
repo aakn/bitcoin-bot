@@ -119,6 +119,4 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
 
   private def candlestick(avg: BigDecimal) = Candlestick(DateTime.now(), avg, 0, 0, 0, 0)
 
-  private def candlesticks(avgs: BigDecimal*) = avgs.map(candlestick)
-
 }

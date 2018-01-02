@@ -25,7 +25,7 @@ object Strategy {
   }
 
   private def addCandlestick(candlestick: Candlestick): State[Strategy, Unit] = modify[Strategy] { s =>
-    val threshold = DateTime.now().minusMillis(s.discardDuration.toMillis.toInt)
+    val threshold = DateTime.now().minusMinutes(s.discardDuration.toMinutes.toInt)
     val candlesticks = (s.candlesticks :+ candlestick).dropWhile(_.date.isBefore(threshold))
     s.copy(candlesticks = candlesticks)
   }

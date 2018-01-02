@@ -20,7 +20,7 @@ object Candlestick {
     )
   )
 
-  implicit val chartResponseJsonFormat: Reads[Candlestick] = (
+  val candlestickReads: Reads[Candlestick] = (
     (JsPath \ "date").read[DateTime](jodaDateReads) and
       (JsPath \ "weightedAverage").read[BigDecimal](bigDecimalReads) and
       (JsPath \ "open").read[BigDecimal](bigDecimalReads) and
@@ -29,4 +29,10 @@ object Candlestick {
       (JsPath \ "low").read[BigDecimal](bigDecimalReads)
     ) (Candlestick.apply _)
 
+  val candlestickWrites: Writes[Candlestick] = (cs: Candlestick) => Json.obj(
+    "average" -> cs.average,
+    "date" -> cs.date.toDateTimeISO.toString()
+  )
+
+  implicit val candlestickFormat: Format[Candlestick] = Format(candlestickReads, candlestickWrites)
 }

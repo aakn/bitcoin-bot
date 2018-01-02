@@ -7,8 +7,11 @@ import org.scalatestplus.play.PlaySpec
 
 import scala.concurrent.duration._
 
-
 class StrategySpec extends PlaySpec with BeforeAndAfterEach {
+
+  override def beforeEach(): Unit = {
+    DateTimeUtils.setCurrentMillisFixed(1500000000000L)
+  }
 
   override def afterEach() {
     DateTimeUtils.setCurrentMillisSystem()
@@ -58,7 +61,12 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
 
       val updated = transitions.exec(initial)
 
-      updated.openTrades mustBe List(Trade.init(8, 4))
+      inside(updated.openTrades.head) { case Trade(state, entryPrice, _, entryTime, _, stopLoss) =>
+        state mustBe Open
+        entryPrice mustBe 8
+        stopLoss mustBe 4
+        entryTime mustBe DateTime.now()
+      }
     }
 
     "open two trades if simultaneousTrades is set to 2" in {
@@ -71,7 +79,17 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
 
       val updated = transitions.exec(initial)
 
-      updated.openTrades mustBe List(Trade.init(8, 4), Trade.init(6, 3))
+      updated.openTrades.size mustBe 2
+      inside(updated.openTrades.head) { case Trade(state, entryPrice, _, _, _, stopLoss) =>
+        state mustBe Open
+        entryPrice mustBe 8
+        stopLoss mustBe 4
+      }
+      inside(updated.openTrades(1)) { case Trade(state, entryPrice, _, _, _, stopLoss) =>
+        state mustBe Open
+        entryPrice mustBe 6
+        stopLoss mustBe 3
+      }
     }
 
     "not open new trade if a trade is already open" in {
@@ -84,7 +102,11 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
 
       val updated = transitions.exec(initial)
 
-      updated.openTrades mustBe List(Trade.init(8, 4))
+      updated.openTrades.size mustBe 1
+      inside(updated.openTrades.head) { case Trade(state, entryPrice, _, _, _, _) =>
+        state mustBe Open
+        entryPrice mustBe 8
+      }
     }
 
     "close open trades" in {
@@ -97,7 +119,12 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
 
       val updated = transitions.exec(initial)
 
-      updated.closedTrades mustBe List(Trade(Closed, 8, Some(14), 4))
+      updated.openTrades mustBe empty
+      inside(updated.closedTrades.head) { case Trade(state, entryPrice, exitPrice, _, _, _) =>
+        state mustBe Closed
+        entryPrice mustBe 8
+        exitPrice must contain(14)
+      }
     }
 
     "handle stop losses" in {
@@ -111,8 +138,12 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
 
       val updated = transitions.exec(initial)
 
-      updated.openTrades mustBe List()
-      updated.closedTrades mustBe List(Trade(StopLoss, 8, Some(4), 4))
+      updated.openTrades mustBe empty
+      inside(updated.closedTrades.head) { case Trade(state, entryPrice, exitPrice, _, _, _) =>
+        state mustBe StopLoss
+        entryPrice mustBe 8
+        exitPrice must contain(4)
+      }
     }
 
   }

@@ -31,6 +31,7 @@ object Strategy {
   }
 
   private def closeTrades(): State[Strategy, Unit] = modify[Strategy] { s =>
+    val date = s.candlesticks.last.date
     val currentPrice = s.candlesticks.last.average
     val indicated = Indicator.movingAverage(6.hours)(s.candlesticks)
 
@@ -39,17 +40,18 @@ object Strategy {
         s.openTrades
           .partition(currentPrice > _.entryPrice)
       } else (List(), s.openTrades)
-    val closedTrades = s.closedTrades ::: toBeClosed.map(Trade.close(currentPrice).exec(_))
+    val closedTrades = s.closedTrades ::: toBeClosed.map(Trade.close(currentPrice, date).exec(_))
 
     s.copy(openTrades = openTrades, closedTrades = closedTrades)
   }
 
 
   private def handleStopLosses(): State[Strategy, Unit] = modify[Strategy] { s =>
+    val date = s.candlesticks.last.date
     val currentPrice = s.candlesticks.last.average
 
     val (stopLossTrades, openTrades) = s.openTrades
-      .map(Trade.tick(currentPrice).exec)
+      .map(Trade.tick(currentPrice, date).exec)
       .partition(_.status == StopLoss)
     val closedTrades = s.closedTrades ::: stopLossTrades
 
@@ -57,12 +59,13 @@ object Strategy {
   }
 
   private def openNewTrade(): State[Strategy, Unit] = modify[Strategy] { s =>
+    val date = s.candlesticks.last.date
     val currentPrice = s.candlesticks.last.average
     val indicated = Indicator.movingAverage(6.hours)(s.candlesticks)
 
     val openTrades =
       if (s.openTrades.lengthCompare(s.simultaneousTrades) < 0 && currentPrice < indicated) {
-        s.openTrades :+ Trade.init(currentPrice, currentPrice * s.stopLossThreshold)
+        s.openTrades :+ Trade.init(currentPrice, date, currentPrice * s.stopLossThreshold)
       } else s.openTrades
 
     s.copy(openTrades = openTrades)

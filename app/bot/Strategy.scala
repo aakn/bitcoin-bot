@@ -1,6 +1,5 @@
 package bot
 
-import org.joda.time.DateTime
 
 import scala.concurrent.duration.{FiniteDuration, _}
 import scalaz.State
@@ -25,8 +24,12 @@ object Strategy {
   }
 
   private def addCandlestick(candlestick: Candlestick): State[Strategy, Unit] = modify[Strategy] { s =>
-    val threshold = DateTime.now().minusMinutes(s.discardDuration.toMinutes.toInt)
-    val candlesticks = (s.candlesticks :+ candlestick).dropWhile(_.date.isBefore(threshold))
+    val candlesticks = if (s.candlesticks.isEmpty) {
+      List(candlestick)
+    } else {
+      val threshold = candlestick.date.minusMinutes(s.discardDuration.toMinutes.toInt)
+      (s.candlesticks :+ candlestick).dropWhile(_.date.isBefore(threshold))
+    }
     s.copy(candlesticks = candlesticks)
   }
 

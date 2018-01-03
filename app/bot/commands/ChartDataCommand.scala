@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ChartDataCommand @Inject()(ws: WSClient, @Assisted currencyPair: String,
                                  @Assisted("startDate") startDate: DateTime,
                                  @Assisted("endDate") endDate: DateTime,
-                                 @Assisted period: FiniteDuration)
+                                 @Assisted period: Duration)
                                 (implicit ec: ExecutionContext) extends HystrixFutureCommand[List[Candlestick]](GroupKeys.poloniex()) {
 
   def run(): Future[List[Candlestick]] = {
@@ -28,9 +28,7 @@ class ChartDataCommand @Inject()(ws: WSClient, @Assisted currencyPair: String,
       .addHttpHeaders("Cookie" -> "__cfduid=d8ad9b0167dc8b36d5528867a5c30bfb21509703260; _ga=GA1.2.817619400.1509703267; _gid=GA1.2.408801550.1514101253; POLOSESSID=tj6f45cclc1j405mpg0nl7msu7; cf_clearance=e88e296e2214480455696a547f7be5401fad0c99-1514102613-1800")
       .withRequestTimeout(10.seconds)
       .get
-      .map {
-        r => r.json.as[List[Candlestick]]
-      }
+      .map(r => r.json.as[List[Candlestick]])
   }
 
   private def dateTimeToString(dt: DateTime) = {

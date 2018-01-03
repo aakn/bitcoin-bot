@@ -11,11 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class BackTestTrader @Inject()(chart: Chart)(implicit ec: ExecutionContext) {
 
-  def run(): Future[Strategy] = {
-    val currencyPair = "USDT_BTC"
-    val startDate = new DateTime().minusDays(30)
-    val endDate = new DateTime().plusDays(1)
-    val interval = 30.minutes
+  def run(currencyPair: String, startDate: DateTime, endDate: DateTime, interval: Duration): Future[Strategy] = {
 
     val strategy = Strategy.init(discardDuration = 31.days)
 

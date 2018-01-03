@@ -7,12 +7,12 @@ import bot.commands.ChartDataCommandBuilder
 import lib.hystrix.Futures._
 import org.joda.time.DateTime
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
 class Chart @Inject()(command: ChartDataCommandBuilder)(implicit ec: ExecutionContext) {
 
-  def backTest(currencyPair: String, startDate: DateTime, endDate: DateTime, period: FiniteDuration): Future[Stream[Candlestick]] =
+  def backTest(currencyPair: String, startDate: DateTime, endDate: DateTime, period: Duration): Future[Stream[Candlestick]] =
     command(currencyPair, startDate, endDate, period).future
       .map(_.toStream)
 

@@ -28,9 +28,9 @@ class BackTestTraderSpec extends AsyncFlatSpec with OneInstancePerTest {
   "BackTestTrader.run()" should "call executor.tick once with a stream of one candlestick" in {
 
     trader.run("USD_BTC", DateTime.now, DateTime.now, 30.minutes)
-      .map(s => {
+      .map(analysis => {
         verify(executor).tick(cs)
-        assert(strategy == s)
+        assert(analysis != null)
       })
   }
 

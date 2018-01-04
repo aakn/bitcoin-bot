@@ -30,22 +30,24 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
 
   "Strategy.tick" must {
     "add candlestick" in {
+      val executor = new StrategyExecutor
       val initial = Strategy.init()
       val cs = candlestick(10)
-      val updated = Strategy.tick(cs).exec(initial)
+      val updated = executor.tick(cs).exec(initial)
 
       initial.candlesticks mustBe List()
       updated.candlesticks mustBe List(cs)
     }
 
     "add candlestick added and discard old candlesticks" in {
+      val executor = new StrategyExecutor
       val initial = Strategy.init(discardDuration = 10.minutes)
       val firstCs = candlestick(10)
-      val firstUpdate = Strategy.tick(firstCs).exec(initial)
+      val firstUpdate = executor.tick(firstCs).exec(initial)
 
       DateTimeUtils.setCurrentMillisOffset(15.minutes.toMillis)
       val secondCs = candlestick(10)
-      val secondUpdate = Strategy.tick(secondCs).exec(firstUpdate)
+      val secondUpdate = executor.tick(secondCs).exec(firstUpdate)
 
       initial.candlesticks mustBe List()
       firstUpdate.candlesticks mustBe List(firstCs)
@@ -53,10 +55,11 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
     }
 
     "open new trade" in {
+      val executor = new StrategyExecutor
       val initial = Strategy.init()
       val transitions = for {
-        _ <- Strategy.tick(candlestick(10))
-        _ <- Strategy.tick(candlestick(8))
+        _ <- executor.tick(candlestick(10))
+        _ <- executor.tick(candlestick(8))
       } yield ()
 
       val updated = transitions.exec(initial)
@@ -70,11 +73,12 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
     }
 
     "open two trades if simultaneousTrades is set to 2" in {
+      val executor = new StrategyExecutor
       val initial = Strategy.init(simultaneousTrades = 2)
       val transitions = for {
-        _ <- Strategy.tick(candlestick(10))
-        _ <- Strategy.tick(candlestick(8))
-        _ <- Strategy.tick(candlestick(6))
+        _ <- executor.tick(candlestick(10))
+        _ <- executor.tick(candlestick(8))
+        _ <- executor.tick(candlestick(6))
       } yield ()
 
       val updated = transitions.exec(initial)
@@ -93,11 +97,12 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
     }
 
     "not open new trade if a trade is already open" in {
+      val executor = new StrategyExecutor
       val initial = Strategy.init()
       val transitions = for {
-        _ <- Strategy.tick(candlestick(10))
-        _ <- Strategy.tick(candlestick(8))
-        _ <- Strategy.tick(candlestick(6))
+        _ <- executor.tick(candlestick(10))
+        _ <- executor.tick(candlestick(8))
+        _ <- executor.tick(candlestick(6))
       } yield ()
 
       val updated = transitions.exec(initial)
@@ -110,11 +115,12 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
     }
 
     "close open trades" in {
+      val executor = new StrategyExecutor
       val initial = Strategy.init()
       val transitions = for {
-        _ <- Strategy.tick(candlestick(10))
-        _ <- Strategy.tick(candlestick(8))
-        _ <- Strategy.tick(candlestick(14))
+        _ <- executor.tick(candlestick(10))
+        _ <- executor.tick(candlestick(8))
+        _ <- executor.tick(candlestick(14))
       } yield ()
 
       val updated = transitions.exec(initial)
@@ -128,12 +134,13 @@ class StrategySpec extends PlaySpec with BeforeAndAfterEach {
     }
 
     "handle stop losses" in {
+      val executor = new StrategyExecutor
       val initial = Strategy.init()
       val transitions = for {
-        _ <- Strategy.tick(candlestick(10))
-        _ <- Strategy.tick(candlestick(8))
-        _ <- Strategy.tick(candlestick(6))
-        _ <- Strategy.tick(candlestick(4))
+        _ <- executor.tick(candlestick(10))
+        _ <- executor.tick(candlestick(8))
+        _ <- executor.tick(candlestick(6))
+        _ <- executor.tick(candlestick(4))
       } yield ()
 
       val updated = transitions.exec(initial)

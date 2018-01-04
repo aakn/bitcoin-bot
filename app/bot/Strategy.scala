@@ -1,17 +1,15 @@
 package bot
 
 
+import com.google.inject.Inject
+
 import scala.concurrent.duration.{FiniteDuration, _}
 import scalaz.State
 import scalaz.State._
 
 case class Strategy(candlesticks: List[Candlestick], openTrades: List[Trade], closedTrades: List[Trade], simultaneousTrades: Int, discardDuration: FiniteDuration, stopLossThreshold: BigDecimal)
 
-
-object Strategy {
-  def init(simultaneousTrades: Int = 1, discardDuration: FiniteDuration = 6.hours, stopLossThreshold: BigDecimal = 0.5): Strategy =
-    Strategy(List(), List(), List(), simultaneousTrades, discardDuration, stopLossThreshold)
-
+class StrategyExecutor @Inject()() {
   def tick(candlestick: Candlestick): State[Strategy, Unit] = modify[Strategy] { s =>
     def stateTransitions = for {
       _ <- addCandlestick(candlestick)
@@ -73,4 +71,9 @@ object Strategy {
 
     s.copy(openTrades = openTrades)
   }
+}
+
+object Strategy {
+  def init(simultaneousTrades: Int = 1, discardDuration: FiniteDuration = 6.hours, stopLossThreshold: BigDecimal = 0.5): Strategy =
+    Strategy(List(), List(), List(), simultaneousTrades, discardDuration, stopLossThreshold)
 }

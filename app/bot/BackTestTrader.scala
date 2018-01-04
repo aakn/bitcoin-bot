@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class BackTestTrader @Inject()(chart: Chart)(implicit ec: ExecutionContext) {
+class BackTestTrader @Inject()(chart: Chart, executor: StrategyExecutor)(implicit ec: ExecutionContext) {
 
   def run(currencyPair: String, startDate: DateTime, endDate: DateTime, interval: Duration): Future[Strategy] = {
 
@@ -20,6 +20,6 @@ class BackTestTrader @Inject()(chart: Chart)(implicit ec: ExecutionContext) {
   }
 
   private def iterate(strategy: Strategy)(stream: Stream[Candlestick]): Strategy =
-    stream.foldLeft(strategy)((s, cs) => Strategy.tick(cs).exec(s))
+    stream.foldLeft(strategy)((s, cs) => executor.tick(cs).exec(s))
 
 }

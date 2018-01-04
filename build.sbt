@@ -23,6 +23,11 @@ libraryDependencies ++= Seq(
   "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % jacksonVersion
 )
 
+libraryDependencies ++= Seq(
+  "org.scalamock" %% "scalamock" % "4.0.0" % Test,
+  "org.mockito" % "mockito-core" % "2.13.0" % Test
+)
+
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.bitbot.controllers._"
 

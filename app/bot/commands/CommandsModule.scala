@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule
 import com.google.inject.assistedinject.{Assisted, FactoryModuleBuilder}
 import org.joda.time.DateTime
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.Duration
 
 class CommandsModule extends AbstractModule {
   override def configure(): Unit = {
@@ -14,6 +14,6 @@ class CommandsModule extends AbstractModule {
 
 trait ChartDataCommandBuilder {
   def apply(currencyPair: String, @Assisted("startDate") startDate: DateTime,
-            @Assisted("endDate") endDate: DateTime, period: FiniteDuration): ChartDataCommand
+            @Assisted("endDate") endDate: DateTime, period: Duration): ChartDataCommand
 }
 

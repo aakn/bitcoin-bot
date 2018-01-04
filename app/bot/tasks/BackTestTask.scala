@@ -4,6 +4,7 @@ import javax.inject.Inject
 
 import akka.actor.{ActorSystem, Cancellable}
 import bot.BackTestTrader
+import org.joda.time.DateTime
 import play.Logger
 
 import scala.concurrent.ExecutionContext
@@ -14,7 +15,7 @@ class BackTestTask @Inject()(actorSystem: ActorSystem, trader: BackTestTrader)(i
   def run: Cancellable = actorSystem.scheduler.scheduleOnce(delay = 0.seconds) {
     // the block of code that will be executed
     Logger.info("Executing something...")
-    trader.start()
+    trader.run("USDT_BTC", DateTime.now.minusDays(30), DateTime.now, 30.minutes)
   }
 
 }

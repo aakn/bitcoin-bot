@@ -24,6 +24,12 @@ function loadBackTestData() {
             throw new Error(`Network response was not ok. Got ${response.status} instead`);
         })
         .then(data => {
+            document.getElementById("seed").textContent = data.profits.seed;
+            document.getElementById("gross-profit").textContent = data.profits.gross;
+            document.getElementById("net-profit").textContent = data.profits.net;
+            return data;
+        })
+        .then(data => {
             const prices = data.candlesticks.map(candlestick => [new Date(candlestick.date).getTime(), candlestick.average]);
             const trades = buildTrades(data.trades);
             renderChart(prices, trades);

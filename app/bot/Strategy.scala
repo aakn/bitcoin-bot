@@ -7,7 +7,8 @@ import scala.concurrent.duration.{FiniteDuration, _}
 import scalaz.State
 import scalaz.State._
 
-case class Strategy(candlesticks: List[Candlestick], openTrades: List[Trade], closedTrades: List[Trade], simultaneousTrades: Int, discardDuration: FiniteDuration, stopLossThreshold: BigDecimal)
+case class Strategy(candlesticks: List[Candlestick], openTrades: List[Trade], closedTrades: List[Trade],
+                    simultaneousTrades: Int, discardDuration: FiniteDuration, stopLossThreshold: BigDecimal)
 
 class StrategyExecutor @Inject()() {
   def tick(candlestick: Candlestick): State[Strategy, Unit] = modify[Strategy] { s =>

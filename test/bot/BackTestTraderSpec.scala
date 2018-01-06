@@ -18,7 +18,7 @@ class BackTestTraderSpec extends AsyncFlatSpec with OneInstancePerTest {
   private val executor = mock[StrategyExecutor]
   private val trader = new BackTestTrader(chart, executor)
   private val cs = candlestick(10)
-  private val strategy = Strategy.init()
+  private val strategy = Strategy(List(cs), List(), List(), 1, 0.minutes, 0)
 
   when(chart.backTest(eql("USD_BTC"), any(), any(), eql(30.minutes))).thenReturn(Future {
     Stream(cs)

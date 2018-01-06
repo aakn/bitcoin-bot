@@ -1,0 +1,8 @@
+#bot-chart {
+    height: 400px;
+    min-width: 310px;
+}
+
+.table th, .table td {
+    border-top: none !important;
+}

@@ -26,7 +26,7 @@ class BotController @Inject()(botTask: BotTask, backTestTrader: BackTestTrader, 
     Accepted
   }
 
-  def backTest(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
+  def backTest() = Action.async { implicit request: Request[AnyContent] =>
     val (defaultStartDate, defaultEndDate, defaultInterval) = (DateTime.now.minusDays(3), DateTime.now, 30.minutes)
     val currencyPair = request.getQueryString("currency-pair").getOrElse("USDT_BTC")
     val startDate: DateTime = parseDate(request.getQueryString("start-date"), defaultStartDate)
@@ -46,7 +46,6 @@ class BotController @Inject()(botTask: BotTask, backTestTrader: BackTestTrader, 
           Ok(mapper.writeValueAsString(res)).as(JSON)
         })
     }
-
   }
 
   private def parseDate(date: Option[String], default: DateTime): DateTime = {

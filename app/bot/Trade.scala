@@ -12,7 +12,8 @@ case object Closed extends TradeStatus
 
 case object StopLoss extends TradeStatus
 
-case class Trade(status: TradeStatus, entryPrice: BigDecimal, exitPrice: Option[BigDecimal], entryTime: DateTime, exitTime: Option[DateTime], stopLoss: BigDecimal) {
+case class Trade(status: TradeStatus, entryPrice: BigDecimal, exitPrice: Option[BigDecimal],
+                 entryTime: DateTime, exitTime: Option[DateTime], stopLoss: BigDecimal) {
 
   def pretty(): String = {
     if (status == Closed || status == StopLoss) {

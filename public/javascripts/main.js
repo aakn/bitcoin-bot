@@ -18,7 +18,7 @@ function loadBackTestData() {
 
 function renderChart(prices, trades) {
     // Create the chart
-    Highcharts.stockChart('container', {
+    Highcharts.stockChart('bot-chart', {
         rangeSelector: {
             selected: 5
         },

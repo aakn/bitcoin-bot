@@ -1,5 +1,7 @@
 package bot
 
+import scala.math.BigDecimal.RoundingMode
+
 case class StrategyAnalysis(candlesticks: List[Candlestick], trades: List[Trade], profits: Profits)
 
 case class Profits(seed: BigDecimal, gross: BigDecimal, net: BigDecimal)
@@ -15,6 +17,7 @@ object StrategyAnalysis {
       .map(t => (t.exitPrice.get, t.entryPrice, t.exitPrice.get * charges.taker, t.entryPrice * charges.taker))
       .map { case (exit, entry, exitFee, entryFee) => exit - entry - exitFee - entryFee }.sum
     val seed = strategy.candlesticks.head.average
-    StrategyAnalysis(strategy.candlesticks, trades, Profits(seed, gross, net))
+    val round = (value: BigDecimal) => value.setScale(2, RoundingMode.HALF_UP)
+    StrategyAnalysis(strategy.candlesticks, trades, Profits(round(seed), round(gross), round(net)))
   }
 }

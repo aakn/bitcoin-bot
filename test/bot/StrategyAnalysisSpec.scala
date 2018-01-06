@@ -6,6 +6,7 @@ import org.scalatest.OneInstancePerTest
 import org.scalatestplus.play.PlaySpec
 
 import scala.concurrent.duration._
+import scala.math.BigDecimal.RoundingMode
 import scala.math._
 
 class StrategyAnalysisSpec extends PlaySpec with OneInstancePerTest {
@@ -23,8 +24,8 @@ class StrategyAnalysisSpec extends PlaySpec with OneInstancePerTest {
       analysis.trades mustBe open ::: closed
       analysis.profits.seed mustBe 1
       analysis.profits.gross mustBe 5
-      val expectedNet = (15 - 10 - 10 * 0.0025 - 15 * 0.0025) + (14 - 12 - 12 * 0.0025 - 14 * 0.0025) + (10 - 12 - 10 * 0.0025 - 12 * 0.0025)
-      analysis.profits.net.doubleValue shouldBe expectedNet +- 0.0001
+      val expectedNet: BigDecimal = (15 - 10 - 10 * 0.0025 - 15 * 0.0025) + (14 - 12 - 12 * 0.0025 - 14 * 0.0025) + (10 - 12 - 10 * 0.0025 - 12 * 0.0025)
+      analysis.profits.net.doubleValue shouldBe expectedNet.setScale(2, RoundingMode.HALF_UP)
     }
   }
 

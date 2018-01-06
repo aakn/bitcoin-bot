@@ -9,7 +9,8 @@ class BotModule extends AbstractModule {
   override def configure(): Unit = {
     val mapper = new ObjectMapper()
     mapper.registerModule(DefaultScalaModule)
-    mapper.registerModule(new JodaModule())
+    mapper.registerModule(new JodaModule)
+    mapper.registerModule(new TradeStatusModule)
     mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
     bind(classOf[ObjectMapper]).toInstance(mapper)
   }
